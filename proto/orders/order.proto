@@ -6,6 +6,7 @@ option go_package = "github.com/votatdat/example-go-grpc-gateway/protogen/golang
 
 import "product/product.proto";
 import "google/api/date.proto";
+import "google/api/annotations.proto";
 
 message Order {
     uint64 order_id = 1 [ json_name = "order_id" ];
@@ -23,6 +24,31 @@ message PayloadWithSingleOrder {
   Order order = 1;
 }
 
+message PayloadWithOrderID {
+  uint64 order_id = 1;
+}
+
 service Orders {
-  rpc AddOrder(PayloadWithSingleOrder) returns (Empty) {}
+  rpc AddOrder(PayloadWithSingleOrder) returns (Empty) {
+    option (google.api.http) = {
+      post: "/v0/orders",
+      body: "*"
+    };
+  }
+  rpc GetOrder(PayloadWithOrderID) returns (PayloadWithSingleOrder) {
+    option (google.api.http) = {
+      get: "/v0/orders/{order_id}",
+    };
+  }
+  rpc UpdateOrder(PayloadWithSingleOrder) returns (Empty) {
+    option (google.api.http) = {
+      put: "/v0/orders",
+      body: "*"
+    };
+  }
+  rpc RemoveOrder(PayloadWithOrderID) returns (Empty) {
+    option (google.api.http) = {
+      delete: "/v0/orders/{order_id}",
+    };
+  }
 }
