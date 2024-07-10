@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/votatdat/example-go-grpc-gateway/protogen/golang/orders"
@@ -16,8 +17,12 @@ import (
 
 func main() {
 	// Set up a connection to the order server.
-	orderServiceAddr := "localhost:50051"
-	conn, err := grpc.Dial(orderServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	var orderServiceAddr string
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, orderServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("could not connect to order service: %v", err)
 	}
